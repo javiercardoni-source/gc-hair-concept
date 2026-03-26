@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GC Hair Concept — Reservar Turno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f0e8;
+  --bg2:#ede8de;
+  --ink:#0e0e0e;
+  --ink2:#2a2a2a;
+  --muted:#8a8580;
+  --line:#d4cfc6;
+  --line2:#c0bbb2;
+  --blk:#111111;
+  --white:#faf8f4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:58px;background:rgba(245,240,232,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-logo{display:flex;align-items:center;gap:.75rem}
+.nav-mark{width:30px;height:30px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:600;letter-spacing:.04em}
+.nav-brand{display:flex;flex-direction:column;line-height:1.1}
+.nav-brand-name{font-family:'Cormorant Garamond',serif;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+.nav-brand-sub{font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:color .2s}
+.nav-links a:hover{color:var(--ink)}
+.btn-nav{background:var(--blk);border:none;color:var(--white);padding:.5rem 1.4rem;font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;font-weight:400;transition:opacity .2s}
+.btn-nav:hover{opacity:.8}
+
+.hero{min-height:100svh;background:var(--blk);color:var(--white);display:grid;grid-template-rows:1fr auto;padding:7rem 3rem 3.5rem;position:relative;overflow:hidden}
+.hero-noise{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px}
+.hero-body{display:flex;flex-direction:column;justify-content:flex-end;gap:2.5rem}
+.hero-kicker{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;animation:fadeUp .7s .1s forwards}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(5rem,14vw,12rem);font-weight:300;line-height:.88;letter-spacing:-.02em;opacity:0;animation:fadeUp .8s .25s forwards}
+.hero-title em{font-style:italic;display:block}
+.hero-desc{font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,2.2vw,1.4rem);font-weight:300;color:rgba(255,255,255,.45);letter-spacing:.04em;opacity:0;animation:fadeUp .7s .45s forwards}
+.hero-cta{opacity:0;animation:fadeUp .7s .6s forwards}
+.btn-hero{display:inline-flex;align-items:center;gap:.8rem;background:var(--white);color:var(--blk);border:none;padding:.85rem 2rem;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500;transition:all .22s}
+.btn-hero:hover{background:#e8e3db;transform:translateY(-1px)}
+.hero-foot{display:flex;justify-content:space-between;align-items:flex-end;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1);opacity:0;animation:fadeUp .7s .75s forwards}
+.hii{display:flex;flex-direction:column;gap:.25rem}
+.hii-label{font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.hii-val{font-size:.8rem;color:rgba(255,255,255,.7);letter-spacing:.04em}
+.hii-val a:hover{color:#fff;transition:color .2s}
+.hero-bg-text{font-family:'Cormorant Garamond',serif;font-size:clamp(5rem,10vw,8rem);font-weight:300;color:rgba(255,255,255,.04);position:absolute;bottom:2rem;right:3rem;line-height:1;pointer-events:none;letter-spacing:-.04em;font-style:italic}
+
+.mqw{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:.65rem 0;background:var(--bg2)}
+.mqt{display:inline-block;animation:mq 24s linear infinite}
+.mqt span{font-size:.59rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);padding:0 1.4rem}
+.mqt span.d{color:var(--ink2);font-size:.38rem;padding:0 .2rem;vertical-align:middle}
+
+.services{padding:6rem 3rem;background:var(--bg)}
+.sec-header{display:grid;grid-template-columns:1fr auto;align-items:baseline;margin-bottom:3.5rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:300}
+.sec-title em{font-style:italic}
+.sec-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.srv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--line)}
+.srv-card{background:var(--bg);padding:2rem 1.75rem;cursor:pointer;transition:background .2s;display:flex;flex-direction:column;gap:.3rem;position:relative;overflow:hidden}
+.srv-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:0;background:var(--ink);transition:height .3s}
+.srv-card:hover{background:var(--white)}
+.srv-card:hover::before{height:100%}
+.srv-name{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400}
+.srv-dur{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:.1rem}
+.srv-price{margin-top:1.5rem;font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300}
+.srv-price-lbl{font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+footer{background:var(--blk);color:var(--white);padding:1.6rem 3rem;display:flex;align-items:center;justify-content:space-between}
+.foot-left{display:flex;align-items:center;gap:1rem}
+.foot-mark{width:26px;height:26px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.78rem}
+.foot-copy{font-size:.65rem;letter-spacing:.08em;color:rgba(255,255,255,.35)}
+.foot-ig{font-size:.65rem;letter-spacing:.14em;color:rgba(255,255,255,.45);transition:color .2s}
+.foot-ig:hover{color:#fff}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center}
+.moverlay.open{display:flex}
+.mback{position:absolute;inset:0;background:rgba(10,10,10,.8);backdrop-filter:blur(6px)}
+.modal{position:relative;z-index:1;width:min(560px,96vw);max-height:94svh;background:var(--white);display:flex;flex-direction:column;animation:modalIn .25s ease;border:1px solid var(--line)}
+.mhdr{padding:1.25rem 2rem 1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.mlogo{display:flex;align-items:center;gap:.65rem}
+.mlogo-mark{width:28px;height:28px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.88rem;font-weight:600}
+.mlogo-text{font-family:'Cormorant Garamond',serif;font-size:.75rem;letter-spacing:.16em;text-transform:uppercase}
+.mclose{background:none;border:none;color:var(--muted);font-size:1.4rem;line-height:1;padding:.2rem;transition:color .2s}
+.mclose:hover{color:var(--ink)}
+.steps-bar{display:flex;padding:.65rem 2rem;gap:.35rem;border-bottom:1px solid var(--line)}
+.sdot{flex:1;height:1.5px;background:var(--line2);transition:background .3s}
+.sdot.active{background:var(--ink)}
+.sdot.done{background:var(--ink);opacity:.3}
+.mbody{flex:1;overflow-y:auto;padding:2rem}
+.mbody::-webkit-scrollbar{width:3px}
+.mbody::-webkit-scrollbar-thumb{background:var(--line2)}
+.step{display:none}
+.step.active{display:block}
+.step-num{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.step-ttl{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;margin-bottom:1.5rem;line-height:1.15}
+.step-ttl em{font-style:italic}
+.step-hint{font-size:.7rem;letter-spacing:.05em;color:var(--muted);margin-bottom:1.25rem;margin-top:-.75rem}
+
+.sopts{display:flex;flex-direction:column;gap:.4rem}
+.sopt{border:1px solid var(--line);padding:1rem 1.2rem;cursor:pointer;transition:all .18s;display:flex;justify-content:space-between;align-items:center;background:var(--bg)}
+.sopt:hover{border-color:var(--ink2);background:var(--white)}
+.sopt.sel{border-color:var(--ink);background:var(--white)}
+.opt-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400}
+.opt-dur{font-size:.6rem;letter-spacing:.1em;color:var(--muted);margin-top:.1rem}
+.opt-price{font-family:'Cormorant Garamond',serif;font-size:1.1rem}
+
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.cal-nav button{background:none;border:1px solid var(--line);color:var(--ink);width:30px;height:30px;font-size:.9rem;transition:all .18s}
+.cal-nav button:hover{border-color:var(--ink);background:var(--ink);color:var(--white)}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;text-transform:capitalize;letter-spacing:.03em}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1.5rem}
+.cal-dh{text-align:center;font-size:.56rem;letter-spacing:.12em;color:var(--muted);padding:.35rem 0;text-transform:uppercase}
+.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.78rem;cursor:pointer;transition:all .14s;position:relative}
+.cal-d.empty,.cal-d.past,.cal-d.unavail{cursor:default;color:var(--muted);opacity:.25;pointer-events:none}
+.cal-d.avail:hover{background:var(--bg2)}
+.cal-d.sel{background:var(--ink);color:var(--white)}
+.cal-d.today::after{content:'';position:absolute;bottom:3px;width:3px;height:3px;border-radius:50%;background:var(--ink)}
+.cal-d.sel.today::after{background:var(--white)}
+.time-lbl{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.slot{border:1px solid var(--line);padding:.45rem;text-align:center;font-size:.75rem;cursor:pointer;transition:all .14s;background:var(--bg);letter-spacing:.02em}
+.slot:hover{border-color:var(--ink);background:var(--white)}
+.slot.sel{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.slot.bkd{opacity:.18;cursor:not-allowed;pointer-events:none}
+
+.fg{margin-bottom:1.1rem}
+.flbl{display:block;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem}
+.finp,.ftxt{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);padding:.65rem 0;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:300;outline:none;transition:border-color .18s}
+.finp:focus,.ftxt:focus{border-color:var(--ink)}
+.ftxt{resize:vertical;min-height:70px;border:1px solid var(--line);padding:.65rem .8rem}
+.ftxt:focus{border-color:var(--ink)}
+
+.csum{border:1px solid var(--line)}
+.csum-row{display:flex;justify-content:space-between;align-items:baseline;padding:.75rem 1.1rem;border-bottom:1px solid var(--line)}
+.csum-row:last-child{border-bottom:none}
+.csum-k{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.csum-v{font-family:'Cormorant Garamond',serif;font-size:1.05rem;text-align:right;max-width:65%}
+
+.success{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3.5rem 2rem;gap:1.75rem;min-height:320px}
+.success.show{display:flex}
+.suc-icon{width:50px;height:50px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.suc-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;line-height:1.2}
+.suc-title em{font-style:italic}
+.suc-sub{font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+.btn-wa{display:inline-flex;align-items:center;gap:.5rem;background:#25d366;color:#fff;border:none;padding:.7rem 1.5rem;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.btn-wa:hover{opacity:.85}
+.btn-sec{background:none;border:1px solid var(--line);color:var(--muted);padding:.55rem 1.1rem;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;transition:all .18s}
+.btn-sec:hover{border-color:var(--ink);color:var(--ink)}
+
+.mfoot{padding:.9rem 2rem;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.btn-back{background:none;border:none;color:var(--muted);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;transition:color .18s}
+.btn-back:hover{color:var(--ink)}
+.btn-back:disabled{opacity:.2;cursor:not-allowed}
+.btn-next{background:var(--ink);border:none;color:var(--white);padding:.65rem 1.6rem;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:400;transition:opacity .2s}
+.btn-next:hover:not(:disabled){opacity:.8}
+.btn-next:disabled{opacity:.3;cursor:not-allowed}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media(max-width:640px){
+  nav{padding:0 1.25rem}
+  .nav-links{display:none}
+  .hero{padding:5.5rem 1.25rem 2rem}
+  .hero-bg-text{display:none}
+  .services{padding:4rem 1.25rem}
+  footer{padding:1.25rem;flex-direction:column;gap:.5rem;text-align:center}
+  .mbody{padding:1.4rem}
+  .mhdr{padding:1rem 1.4rem}
+  .steps-bar{padding:.6rem 1.4rem}
+  .mfoot{padding:.8rem 1.4rem}
+  .slots{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-mark">GC</div>
+    <div class="nav-brand">
+      <span class="nav-brand-name">Hair Concept</span>
+      <span class="nav-brand-sub">Gonzalo Cortez</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a id="nav-ig" href="#" target="_blank">Instagram</a></li>
+  </ul>
+  <button class="btn-nav" onclick="openModal()">Reservar turno</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-body">
+    <p class="hero-kicker" id="hero-kicker">Peluquero Colorista · Villa del Parque</p>
+    <h1 class="hero-title">GC<br><em>Hair<br>Concept</em></h1>
+    <p class="hero-desc" id="hero-desc">Colorización artística. Cortes con identidad. Resultados únicos.</p>
+    <div class="hero-cta">
+      <button class="btn-hero" onclick="openModal()">Reservar turno <span>→</span></button>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="hii"><span class="hii-label">Dirección</span><span class="hii-val" id="hi-addr">Simbron 3212, Villa del Parque</span></div>
+    <div class="hii"><span class="hii-label">Horarios</span><span class="hii-val" id="hi-hours">Mar–Sab · 10 a 20hs</span></div>
+    <div class="hii"><span class="hii-label">Instagram</span><span class="hii-val"><a id="hi-ig" href="#" target="_blank">@gonzalocortez.hc</a></span></div>
+  </div>
+  <div class="hero-bg-text">GC</div>
+</section>
+
+<div class="mqw">
+  <div class="mqt">
+    <span>GC Hair Concept</span><span class="d">◆</span><span>Peluquero Colorista</span><span class="d">◆</span><span>Villa del Parque</span><span class="d">◆</span><span>Colorización Artística</span><span class="d">◆</span><span>Cortes Únicos</span><span class="d">◆</span><span>Rubio · Colorado · Fantasía</span><span class="d">◆</span><span>Reservá tu turno</span><span class="d">◆</span>
+    <span>GC Hair Concept</span><span class="d">◆</span><span>Peluquero Colorista</span><span class="d">◆</span><span>Villa del Parque</span><span class="d">◆</span><span>Colorización Artística</span><span class="d">◆</span><span>Cortes Únicos</span><span class="d">◆</span><span>Rubio · Colorado · Fantasía</span><span class="d">◆</span><span>Reservá tu turno</span><span class="d">◆</span>
+  </div>
+</div>
+
+<section class="services" id="servicios">
+  <div class="sec-header">
+    <h2 class="sec-title">Nuestros <em>servicios</em></h2>
+    <span class="sec-label">Precios &amp; servicios</span>
+  </div>
+  <div class="srv-grid" id="srv-grid"></div>
+</section>
+
+<footer>
+  <div class="foot-left">
+    <div class="foot-mark">GC</div>
+    <span class="foot-copy" id="foot-copy">© 2025 GC Hair Concept · Gonzalo Cortez</span>
+  </div>
+  <a class="foot-ig" id="foot-ig" href="#" target="_blank">@gonzalocortez.hc</a>
+</footer>
+
+<div class="moverlay" id="moverlay">
+  <div class="mback" onclick="closeModal()"></div>
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mlogo"><div class="mlogo-mark">GC</div><span class="mlogo-text">Hair Concept</span></div>
+      <button class="mclose" onclick="closeModal()">×</button>
+    </div>
+    <div class="steps-bar">
+      <div class="sdot active" id="dot1"></div><div class="sdot" id="dot2"></div><div class="sdot" id="dot3"></div><div class="sdot" id="dot4"></div>
+    </div>
+    <div class="mbody" id="mbody">
+      <div class="step active" id="step1">
+        <p class="step-num">Paso 01 / 04</p>
+        <h3 class="step-ttl">¿Qué <em>servicio</em> necesitás?</h3>
+        <p class="step-hint">Seleccioná una opción</p>
+        <div class="sopts" id="sopts"></div>
+      </div>
+      <div class="step" id="step2">
+        <p class="step-num">Paso 02 / 04</p>
+        <h3 class="step-ttl">¿Cuándo <em>venís?</em></h3>
+        <p class="step-hint">Martes a Sábado · 10 a 20hs</p>
+        <div class="cal-nav">
+          <button onclick="prevMonth()">‹</button>
+          <span class="cal-month" id="calLabel"></span>
+          <button onclick="nextMonth()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div id="timeSec" style="display:none">
+          <p class="time-lbl">Horarios disponibles</p>
+          <div class="slots" id="slotsGrid"></div>
+        </div>
+      </div>
+      <div class="step" id="step3">
+        <p class="step-num">Paso 03 / 04</p>
+        <h3 class="step-ttl">Tus <em>datos</em></h3>
+        <p class="step-hint">Para confirmar la reserva</p>
+        <div class="fg"><label class="flbl">Nombre y apellido *</label><input class="finp" id="iName" type="text" placeholder="Juan Pérez"></div>
+        <div class="fg"><label class="flbl">WhatsApp *</label><input class="finp" id="iWa" type="tel" placeholder="11 1234-5678"></div>
+        <div class="fg"><label class="flbl">Email</label><input class="finp" id="iEmail" type="email" placeholder="juan@email.com"></div>
+        <div class="fg"><label class="flbl">Aclaraciones</label><textarea class="ftxt" id="iNotes" placeholder="Algún detalle..."></textarea></div>
+      </div>
+      <div class="step" id="step4">
+        <p class="step-num">Paso 04 / 04</p>
+        <h3 class="step-ttl">Confirmá tu <em>turno</em></h3>
+        <p class="step-hint">Revisá los datos antes de confirmar</p>
+        <div class="csum" id="csum"></div>
+      </div>
+    </div>
+    <div class="success" id="successScr">
+      <div class="suc-icon">✓</div>
+      <div><h3 class="suc-title">¡Turno <em>confirmado!</em></h3><p class="suc-sub" style="margin-top:.5rem">Te contactaremos para confirmar</p></div>
+      <a class="btn-wa" id="waLink" href="#" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <button class="btn-sec" onclick="newBooking()">Nuevo turno</button>
+    </div>
+    <div class="mfoot" id="mfoot">
+      <button class="btn-back" id="btnBack" onclick="prevStep()" disabled>← Volver</button>
+      <button class="btn-next" id="btnNext" onclick="nextStep()" disabled>Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEF_SRV=[{id:1,name:'Corte',price:15000,duration:45},{id:2,name:'Coloración',price:35000,duration:120},{id:3,name:'Balayage',price:45000,duration:150},{id:4,name:'Mechas',price:40000,duration:120},{id:5,name:'Tinte',price:25000,duration:60},{id:6,name:'Tratamiento',price:12000,duration:30}];
+const DEF_TXT={heroSubtitle:'Peluquero Colorista · Villa del Parque',heroDesc:'Colorización artística. Cortes con identidad. Resultados únicos.',footerText:'© 2025 GC Hair Concept · Gonzalo Cortez',address:'Simbron 3212, Villa del Parque',hours:'Mar–Sab · 10 a 20hs',instagram:'gonzalocortez.hc',whatsapp:'5491100000000'};
+const getSrv=()=>JSON.parse(localStorage.getItem('gc_services')||'null')||DEF_SRV;
+const getTxt=()=>Object.assign({},DEF_TXT,JSON.parse(localStorage.getItem('gc_texts')||'{}'));
+const getAppts=()=>JSON.parse(localStorage.getItem('gc_appointments')||'[]');
+const saveAppt=a=>{const all=getAppts();all.push(a);localStorage.setItem('gc_appointments',JSON.stringify(all));};
+
+function initPage(){
+  const T=getTxt();
+  document.getElementById('hero-kicker').textContent=T.heroSubtitle;
+  document.getElementById('hero-desc').textContent=T.heroDesc;
+  document.getElementById('hi-addr').textContent=T.address;
+  document.getElementById('hi-hours').textContent=T.hours;
+  document.getElementById('hi-ig').textContent='@'+T.instagram;
+  document.getElementById('hi-ig').href='https://instagram.com/'+T.instagram;
+  document.getElementById('nav-ig').href='https://instagram.com/'+T.instagram;
+  document.getElementById('foot-copy').textContent=T.footerText;
+  document.getElementById('foot-ig').textContent='@'+T.instagram;
+  document.getElementById('foot-ig').href='https://instagram.com/'+T.instagram;
+  renderSrvGrid();
+}
+function renderSrvGrid(){
+  document.getElementById('srv-grid').innerHTML=getSrv().map(s=>`
+    <div class="srv-card" onclick="openModal(${s.id})">
+      <div class="srv-name">${s.name}</div>
+      <div class="srv-dur">${s.duration} min</div>
+      <div class="srv-price">$${s.price.toLocaleString('es-AR')}</div>
+      <div class="srv-price-lbl">ARS</div>
+    </div>`).join('');
+}
+
+let curStep=1,bk={},calY,calM;
+function openModal(preId=null){resetBk();if(preId)selSrv(preId);renderSopts();document.getElementById('moverlay').classList.add('open');document.body.style.overflow='hidden';goStep(1);}
+function closeModal(){document.getElementById('moverlay').classList.remove('open');document.body.style.overflow='';}
+function resetBk(){
+  bk={sid:null,sname:'',sprice:0,sdur:0,date:'',time:'',name:'',wa:'',email:'',notes:''};
+  document.getElementById('successScr').classList.remove('show');
+  document.getElementById('mbody').style.display='';document.getElementById('mfoot').style.display='';document.querySelector('.steps-bar').style.display='';
+  ['iName','iWa','iEmail','iNotes'].forEach(id=>document.getElementById(id).value='');
+  const n=new Date();calY=n.getFullYear();calM=n.getMonth();
+}
+function renderSopts(){
+  document.getElementById('sopts').innerHTML=getSrv().map(s=>`
+    <div class="sopt ${bk.sid===s.id?'sel':''}" onclick="selSrv(${s.id})" id="opt${s.id}">
+      <div><div class="opt-name">${s.name}</div><div class="opt-dur">${s.duration} min</div></div>
+      <div class="opt-price">$${s.price.toLocaleString('es-AR')}</div>
+    </div>`).join('');
+}
+function selSrv(id){
+  const s=getSrv().find(x=>x.id===id);if(!s)return;
+  Object.assign(bk,{sid:s.id,sname:s.name,sprice:s.price,sdur:s.duration});
+  document.querySelectorAll('.sopt').forEach(e=>e.classList.remove('sel'));
+  const el=document.getElementById('opt'+id);if(el)el.classList.add('sel');
+  updNext();
+}
+function goStep(n){
+  document.querySelectorAll('.step').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.sdot').forEach((d,i)=>{d.classList.remove('active','done');if(i+1<n)d.classList.add('done');else if(i+1===n)d.classList.add('active');});
+  curStep=n;
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('btnBack').disabled=n===1;
+  document.getElementById('btnNext').textContent=n===4?'Confirmar →':'Continuar →';
+  if(n===2)renderCal();if(n===4)renderCsum();
+  updNext();document.getElementById('mbody').scrollTop=0;
+}
+function nextStep(){
+  if(curStep===3){const nm=document.getElementById('iName').value.trim(),wa=document.getElementById('iWa').value.trim();if(!nm||!wa){alert('Por favor completá nombre y WhatsApp.');return;}bk.name=nm;bk.wa=wa;bk.email=document.getElementById('iEmail').value.trim();bk.notes=document.getElementById('iNotes').value.trim();}
+  if(curStep===4){confirmBk();return;}
+  if(curStep<4)goStep(curStep+1);
+}
+function prevStep(){if(curStep>1)goStep(curStep-1);}
+function updNext(){const d=document.getElementById('btnNext');if(curStep===1)d.disabled=!bk.sid;else if(curStep===2)d.disabled=!bk.date||!bk.time;else d.disabled=false;}
+const DAYS=['D','L','M','X','J','V','S'],MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],AVAIL=[2,3,4,5,6];
+function renderCal(){
+  document.getElementById('calLabel').textContent=MONTHS[calM]+' '+calY;
+  const fd=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate(),today=new Date();today.setHours(0,0,0,0);
+  let h=DAYS.map(d=>`<div class="cal-dh">${d}</div>`).join('');
+  for(let i=0;i<fd;i++)h+=`<div class="cal-d empty"></div>`;
+  for(let d=1;d<=dim;d++){const dt=new Date(calY,calM,d),dow=dt.getDay();const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const isPast=dt<today,isAvail=AVAIL.includes(dow)&&!isPast,isToday=dt.getTime()===today.getTime();let c='cal-d';if(isToday)c+=' today';if(isPast)c+=' past';else if(!AVAIL.includes(dow))c+=' unavail';else c+=' avail';if(bk.date===ds)c+=' sel';h+=`<div class="${c}" ${isAvail?`onclick="selDate('${ds}')"`:''}>${d}</div>`;}
+  document.getElementById('calGrid').innerHTML=h;
+  if(bk.date)renderSlots();
+}
+function prevMonth(){calM--;if(calM<0){calM=11;calY--;}renderCal();}
+function nextMonth(){calM++;if(calM>11){calM=0;calY++;}renderCal();}
+function selDate(ds){bk.date=ds;bk.time='';renderCal();document.getElementById('timeSec').style.display='block';renderSlots();updNext();}
+function genSlots(dur){const s=[],start=10*60,end=20*60-dur;for(let t=start;t<=end;t+=30)s.push(`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`);return s;}
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function isBooked(ds,ts,dur){const as=getAppts().filter(a=>a.status!=='cancelado'&&a.date===ds),ss=toMin(ts),se=ss+dur;return as.some(a=>{const as2=toMin(a.time),ae=as2+a.sdur;return ss<ae&&se>as2;});}
+function renderSlots(){document.getElementById('slotsGrid').innerHTML=genSlots(bk.sdur).map(t=>{const bkd=isBooked(bk.date,t,bk.sdur),sel=bk.time===t;return `<div class="slot ${bkd?'bkd':''} ${sel?'sel':''}" ${!bkd?`onclick="selTime('${t}')"`:''}>${t}</div>`;}).join('');}
+function selTime(t){bk.time=t;renderSlots();updNext();}
+function renderCsum(){const dObj=new Date(bk.date+'T12:00:00'),df=dObj.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});const rows=[{k:'Servicio',v:bk.sname},{k:'Precio',v:'$'+bk.sprice.toLocaleString('es-AR')+' ARS'},{k:'Fecha',v:df.charAt(0).toUpperCase()+df.slice(1)},{k:'Horario',v:bk.time+' hs'},{k:'Nombre',v:bk.name},{k:'WhatsApp',v:bk.wa}];if(bk.email)rows.push({k:'Email',v:bk.email});if(bk.notes)rows.push({k:'Aclaraciones',v:bk.notes});document.getElementById('csum').innerHTML=rows.map(r=>`<div class="csum-row"><span class="csum-k">${r.k}</span><span class="csum-v">${r.v}</span></div>`).join('');}
+function confirmBk(){const appt={id:Date.now().toString(),...bk,status:'pendiente',createdAt:new Date().toISOString()};saveAppt(appt);const T=getTxt();const dObj=new Date(bk.date+'T12:00:00');const df=dObj.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});const msg=encodeURIComponent(`Hola Gonzalo! Reservé un turno:\n\n*Servicio:* ${bk.sname}\n*Fecha:* ${df}\n*Hora:* ${bk.time} hs\n*Nombre:* ${bk.name}`);document.getElementById('waLink').href=`https://wa.me/${T.whatsapp}?text=${msg}`;document.getElementById('mbody').style.display='none';document.getElementById('mfoot').style.display='none';document.querySelector('.steps-bar').style.display='none';document.getElementById('successScr').classList.add('show');}
+function newBooking(){document.getElementById('mbody').style.display='';document.getElementById('mfoot').style.display='';document.querySelector('.steps-bar').style.display='';document.getElementById('successScr').classList.remove('show');resetBk();renderSopts();goStep(1);}
+initPage();
+</script>
+</body>
+</html>
