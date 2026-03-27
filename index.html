@@ -526,7 +526,7 @@ window.addEventListener('scroll',()=>{document.getElementById('nav').classList.t
 /* ── DATA ── */
 const DEF_SRV=[{id:1,name:'Corte',price:15000,duration:45},{id:2,name:'Coloración',price:35000,duration:120},{id:3,name:'Balayage',price:45000,duration:150},{id:4,name:'Mechas',price:40000,duration:120},{id:5,name:'Tinte',price:25000,duration:60},{id:6,name:'Tratamiento',price:12000,duration:30}];
 const DEF_TXT={heroSubtitle:'Peluquero Colorista · Villa del Parque',footerText:'© 2025 GC Hair Concept · Gonzalo Cortez',address:'Simbron 3212, Villa del Parque',hours:'Mar–Sab · 10 a 20hs',instagram:'gonzalocortez.hc',whatsapp:'5491100000000'};
-const API_URL="https://script.google.com/macros/s/AKfycbwLtv6-Ev1IKRPgvr8yfEhE4cRubGWpGp1nHAFwyUf78XYF_pxuJLCi55wFj-e0y80Bfg/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyj000rBpaz_FgUa2A9799NqxwrWEmh2F2gir_9tO2BMK1m0dAsphg9Nga30w6CilU0Fw/exec";
 let APPTS_CACHE=[];
 const getSrv=()=>JSON.parse(localStorage.getItem('gc_services')||'null')||DEF_SRV;
 const getTxt=()=>Object.assign({},DEF_TXT,JSON.parse(localStorage.getItem('gc_texts')||'{}'));
