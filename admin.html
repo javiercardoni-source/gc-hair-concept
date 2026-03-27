@@ -271,7 +271,7 @@ const DEF_TXT={heroSubtitle:'Peluquero Colorista · Villa del Parque',heroDesc:'
 const DEF_PW='gc2025';
 const getSrv=()=>JSON.parse(localStorage.getItem('gc_services')||'null')||DEF_SRV;
 const getTxt=()=>Object.assign({},DEF_TXT,JSON.parse(localStorage.getItem('gc_texts')||'{}'));
-let APPTS_CACHE=[];
+let APPTS_CACHE=JSON.parse(localStorage.getItem('gc_appointments')||'[]');
 const getAppts=()=>APPTS_CACHE;
 /* Normalizar fecha */
 function normalizeDate(d){
@@ -307,6 +307,7 @@ async function loadAppts(){
         date:normalizeDate(a.date),
         time:normalizeTime(a.time)
       }));
+      localStorage.setItem('gc_appointments',JSON.stringify(APPTS_CACHE));
     }
   }catch(e){console.error('Error cargando turnos',e);}
   document.getElementById('loadBar').classList.remove('show');
@@ -325,9 +326,18 @@ function fmtDate(ds){if(!ds||ds==='')return'Fecha no especificada';try{const d=n
 function fmtDateLong(ds){if(!ds||ds==='')return'Fecha no especificada';try{const d=new Date(ds+'T12:00:00');if(isNaN(d))return ds;return d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});}catch(e){return ds;}}
 function cleanWa(w){return w.replace(/\D/g,'');}
 async function initAdmin(){
-  await loadAppts();
-  updateCounts();showPage('dashboard');loadTxtsForm();
-  setInterval(async()=>{await loadAppts();updateCounts();if(['dashboard','hoy','proximos','todos'].includes(curPage))refresh();},30000);
+  // Mostrar dashboard inmediatamente con datos locales
+  updateCounts();
+  showPage('dashboard');
+  loadTxtsForm();
+  // Cargar de API en segundo plano
+  loadAppts().then(()=>{refresh();updateCounts();});
+  // Auto-sync cada 30 segundos
+  setInterval(async()=>{
+    await loadAppts();
+    updateCounts();
+    if(['dashboard','hoy','proximos','todos'].includes(curPage))refresh();
+  },30000);
 }
 function updateCounts(){const A=getAppts(),today=todayStr();document.getElementById('cntHoy').textContent=A.filter(a=>a.date===today&&a.status!=='cancelado').length;document.getElementById('cntProx').textContent=A.filter(a=>a.date>today&&a.status!=='cancelado').length;}
 let curPage='dashboard',curFilter='todos',fFrom='',fTo='';
